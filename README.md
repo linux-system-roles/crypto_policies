@@ -1,73 +1,103 @@
-# Role Name
+# crypto_policies
 
-A template for an ansible role which configures some GNU/Linux subsystem or
-service. A brief description of the role goes here.
+This Ansible role manages system-wide crypto policies.
+
+This concept is well adopted since Red Hat Enterprise Linux 8 and in Fedora.
 
 ## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should
-be mentioned here. For instance, if the role uses the EC2 module, it may be a
-good idea to mention in this section that the `boto` package is required.
+The system-wide crypto policies are implemented and tested on RHEL 8/CentOS 8
+and Fedora.
 
 ## Role Variables
 
-A description of all input variables (i.e. variables that are defined in
-`defaults/main.yml`) for the role should go here as these form an API of the
-role.
+By default, this role will just report system status as described in the
+following section.
 
-Variables that are not intended as input, like variables defined in
-`vars/main.yml`, variables that are read from other roles and/or the global
-scope (ie. hostvars, group vars, etc.) can be also mentioned here but keep in
-mind that as these are probably not part of the role API they may change during
-the lifetime.
+ * `crypto_policies_policy`
 
-Example of setting the variables:
+Use this variable to specify the desired crypto policy on the target system,
+which can be either the base policy or a base policy with policy submodule(s)
+as accepted by the `update-crypto-policies` tool. For example `FUTURE` or
+`DEFAULT:NO-SHA1:GOST`. The specified base policy and policy submodule(s)
+must be available on the target system.
 
-```yaml
-template_foo: "oof"
-template_bar: "baz"
-```
+The default value is `null` meaning the configuration is not changed and
+the role will just collect the facts below.
+
+The list of available base policies on the target system can be found in the
+`crypto_policies_available_policies` variable and the list of available policy
+submodules can be found in the `crypto_policies_available_modules` variable.
+
+ * `crypto_policies_reload`
+
+By default (`true`), updating crypto policies forces reload of some of
+the daemons affected by crypto policies in the system. Setting `false`
+prevents this behavior and is helpful if the role is executed during system
+enrollment or some other follow-up tasks is expected to do it later.
+
+ * `crypto_policies_reboot_ok`
+
+Crypto policies can not know all the custom applications using crypto
+libraries that are affected by change of crypto policies so it is recommended
+to reboot after changing crypto policies to make sure all of the services
+and applications will read the new configuration files. By default (`false`),
+if reboot is required, this role will set `crypto_policies_reboot_required`
+variable as described below and it is up to the user of the role to reboot
+the system afterwards, for example after applying some other changes that might
+need reboot. If there are no other tasks in the playbook that require reboot,
+you can set this value to `true` and this role will handle the reboot for you,
+when needed.
 
 ### Variables Exported by the Role
 
-This section is optional.  Some roles may export variables for playbooks to
-use later.  These are analogous to "return values" in Ansible modules.  For
-example, if a role performs some action that will require a system reboot, but
-the user wants to defer the reboot, the role might set a variable like
-`template_reboot_needed: true` that the playbook can use to reboot at a more
-convenient time.
+* `crypto_policies_active`
 
-Example:
+This fact contains the currently active policy name in the format as accepted
+by `crypto_policies_policy` variable above.
 
-`template_reboot_needed` - default `false` - if `true`, this means
-a reboot is needed to apply the changes made by the role
+* `crypto_policies_available_policies`
+
+This is a list of all base policies available on the target system.
+A custom policy files can be installed by copying the `.pol` files into
+`/etc/crypto-policies/policies` directory (not implemented in this role yet).
+
+* `crypto_policies_available_modules`
+
+This is a list of all policy submodules available on the target system.
+A custom policy submodule can be installed by copying the `.pmod` files into
+`/etc/crypto-policies/policies/modules` directory (not implemented in this
+role yet).
+
+* `crypto_policies_reboot_required`
+
+Default `false` - if `true`, this means a reboot is needed to apply
+the changes made by the role
 
 ## Dependencies
 
-A list of other roles hosted on Galaxy should go here, plus any details in
-regards to parameters that may need to be set for other roles, or variables
-that are used from other roles.
+None.
 
 ## Example Playbook
 
-Including an example of how to use your role (for instance, with variables
-passed in as parameters) is always nice for users too:
+The following playbook configures the system to the default crypto policy
+level without SHA1. The update is done without reboot (which is recommended
+to do by the user afterwards).
 
 ```yaml
 - hosts: all
-  vars:
-    template_foo: "foo foo!"
-    template_bar: "progress bar"
-
   roles:
-    - linux-system-roles.template
+    role: linux-system-roles.crypto_policies
+    vars:
+      crypto_policies_policy: "DEFAULT:NO-SHA1"
+      crypto_policies_reload: false
+
 ```
 
 ## License
 
-Whenever possible, please prefer MIT.
+MIT, see the file LICENSE for more information.
 
 ## Author Information
 
-An optional section for the role authors to include contact information, or a
-website (HTML is not allowed).
+Jakub Jelen, 2020

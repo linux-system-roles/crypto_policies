@@ -2,6 +2,21 @@
 ---
 - name: Ensure that the role runs with default parameters
   hosts: all
-
   roles:
-    - linux-system-roles.template
+    - linux-system-roles.crypto_policies
+
+  tasks:
+    - name: Verify the facts are correctly set
+      block:
+        - meta: flush_handlers
+
+        - name: Check the current policy is DEFAULT and common variables
+          assert:
+            that:
+              # assuming clean installation
+              - crypto_policies_active == 'DEFAULT'
+              - "'DEFAULT' in crypto_policies_available_policies"
+              - "'FUTURE' in crypto_policies_available_policies"
+              - "'LEGACY' in crypto_policies_available_policies"
+              - "'NO-CAMELLIA' in crypto_policies_available_modules"
+              - crypto_policies_reboot_required is not defined

@@ -1,12 +1,8 @@
 # SPDX-License-Identifier: MIT
 ---
-# Put the tasks for your role here.
 
-# An example of how to set distribution and version specific internal variables
-# (defined in vars/ directory)
-# see https://github.com/oasis-roles/meta_standards#platform-specific-variables
 - name: Set platform/version specific variables
-  include_vars: "{{ __template_vars_file }}"
+  include_vars: "{{ __crypto_policies_vars_file }}"
   loop:
     - "{{ ansible_facts['os_family'] }}.yml"
     - "{{ ansible_facts['distribution'] }}.yml"
@@ -15,25 +11,64 @@
     - "{{ ansible_facts['distribution'] ~ '_' ~
           ansible_facts['distribution_version'] }}.yml"
   vars:
-    __template_vars_file: "{{ role_path }}/vars/{{ item }}"
-  when: __template_vars_file is file
+    __crypto_policies_vars_file: "{{ role_path }}/vars/{{ item }}"
+  when: __crypto_policies_vars_file is file
 
-# Examples of some tasks:
 - name: Ensure required packages are installed
   package:
-    name: "{{ __template_packages }}"
+    name: "{{ __crypto_policies_packages }}"
     state: present
 
-- name: Ensure required services are enabled and started
-  service:
-    name: "{{ item }}"
-    state: started
-    enabled: yes
-  loop: "{{ __template_services }}"
+- include_tasks: gather_facts.yml
 
-- name: Generate /etc/{{ __template_foo_config }}
-  template:
-    src: "{{ __template_foo_config }}.j2"
-    dest: /etc/{{ __template_foo_config }}
-    backup: yes
-  notify: template handler to restart services
+- name: Find base policies files
+  find:
+    paths:
+      - /usr/share/crypto-policies/policies/
+      - /etc/crypto-policies/policies/
+    patterns: '*.pol'
+  register: __crypto_policies_base_policies
+
+- name: Set available base policies fact
+  set_fact:
+    crypto_policies_available_policies: >-
+      {{ __crypto_policies_base_policies.files | map(attribute='path')
+        | map('basename') | map('splitext') | map('first') | unique | list }}
+    cacheable: yes
+
+- name: Find policy module files
+  find:
+    paths:
+      - /usr/share/crypto-policies/policies/modules/
+      - /etc/crypto-policies/policies/modules/
+    patterns: '*.pmod'
+  register: __crypto_policies_policy_module
+
+- name: Set available policy modules fact
+  set_fact:
+    crypto_policies_available_modules: >-
+      {{ __crypto_policies_policy_module.files | map(attribute='path')
+        | map('basename') | map('splitext') | map('first') | unique | list }}
+    cacheable: yes
+
+- name: Update crypto policy if needed
+  command: >
+    update-crypto-policies
+      {{ '--no-reload' if not crypto_policies_reload else '' }}
+      --set {{ crypto_policies_policy }}
+  when:
+    # TODO check with available policies and modules
+    - crypto_policies_policy is not none
+    - crypto_policies_policy != crypto_policies_active
+  notify: __crypto_policies_handler_modified
+
+- name: Set the reboot_required flag if needed
+  set_fact:
+    crypto_policies_reboot_required: true
+  when:
+    # TODO check with available policies and modules
+    - crypto_policies_policy is not none
+    - crypto_policies_policy != crypto_policies_active
+
+# Update the facts after applying the policy
+- include_tasks: gather_facts.yml
