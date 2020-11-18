@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Ensure that we can set the policy using this role without reboot
+  hosts: all
+  roles:
+    - role: linux-system-roles.crypto_policies
+      vars:
+        crypto_policies_policy: LEGACY
+        crypto_policies_reload: false
+
+  tasks:
+    - name: Verify the facts are correctly set
+      block:
+        - meta: flush_handlers
+
+        - name: Check the current policy is FUTURE
+          assert:
+            that:
+              - "crypto_policies_active == 'LEGACY'"
+              - "crypto_policies_reboot_required == true"

@@ -1,10 +1,17 @@
 # SPDX-License-Identifier: MIT
 ---
-# Put handlers for tasks here.
 
-# Example:
-- name: template handler to restart services
-  service:
-    name: "{{ item }}"
-    state: restarted
-  loop: "{{ __template_services }}"
+- name: reboot the managed host to apply crypto policies changes
+  reboot:
+  listen: __crypto_policies_handler_modified
+  when:
+    - crypto_policies_reboot_required | d(false)
+    - crypto_policies_reboot_ok | d(false)
+
+- name: clear the crypto_policies_reboot_required flag
+  set_fact:
+    crypto_policies_reboot_required: false
+  listen: __crypto_policies_handler_modified
+  when:
+    - crypto_policies_reboot_required | d(false)
+    - crypto_policies_reboot_ok | d(false)
