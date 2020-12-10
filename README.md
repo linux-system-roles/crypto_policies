@@ -1,4 +1,6 @@
 # crypto_policies
+![CI Testing](https://github.com/linux-system-roles/crypto_policies/workflows/tox/badge.svg)
+
 
 This Ansible role manages system-wide crypto policies.
 
