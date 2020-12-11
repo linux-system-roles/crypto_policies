@@ -13,7 +13,7 @@
       block:
         - meta: flush_handlers
 
-        - name: Check the current policy is FUTURE
+        - name: Check the current policy is LEGACY
           assert:
             that:
               - "crypto_policies_active == 'LEGACY'"
