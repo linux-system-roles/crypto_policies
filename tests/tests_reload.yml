@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Ensure that crypto_policy_reload variable works
+  hosts: all
+  tasks:
+
+    - name: Run role to make sure all dependencies are installed
+      include_role:
+        name: linux-system-roles.crypto_policies
+
+    - name: Get SSHD pid before policy update
+      slurp:
+        src: /var/run/sshd.pid
+      register: sshd_pid_before
+
+    - name: Change policy from DEFAULT TO LEGACY (disable reload)
+      include_role:
+        name: linux-system-roles.crypto_policies
+      vars:
+        crypto_policies_policy: LEGACY
+        crypto_policies_reload: false
+
+    - name: Get sshd pid after first update
+      slurp:
+        src: /var/run/sshd.pid
+      register: sshd_pid_after_first
+
+    - name: Verify that policy was changed to LEGACY
+      assert:
+        that:
+          - crypto_policies_active == 'LEGACY'
+    - name: Check the sshd was not reloaded
+      assert:
+        that:
+          - sshd_pid_before.content == sshd_pid_after_first.content
+
+    - name: Change policy from LEGACY to DEFAULT (reload by default)
+      include_role:
+        name: linux-system-roles.crypto_policies
+      vars:
+        crypto_policies_policy: DEFAULT
+
+    - name: Get sshd pid after second update
+      slurp:
+        src: /var/run/sshd.pid
+      register: sshd_pid_after_second
+
+    - name: Verify that policy was changed to DEFAULT
+      assert:
+        that:
+          - crypto_policies_active == 'DEFAULT'
+
+    - name: Check the sshd was reloaded
+      assert:
+        that:
+          - sshd_pid_after_first.content != sshd_pid_after_second.content
