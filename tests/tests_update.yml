@@ -1,20 +1,67 @@
 # SPDX-License-Identifier: MIT
 ---
-- name: Ensure that we can set the policy using this role without reboot
+- name: Ensure that we can set the policy using this role (without reboot)
   hosts: all
-  roles:
-    - role: linux-system-roles.crypto_policies
+  tasks:
+
+    - name: Set correct base policy
+      include_role:
+        name: linux-system-roles.crypto_policies
       vars:
         crypto_policies_policy: LEGACY
         crypto_policies_reload: false
+    - name: Verify that base policy was updated
+      assert:
+        that:
+          - crypto_policies_active == 'LEGACY'
+          - crypto_policies_reboot_required | bool
 
-  tasks:
-    - name: Verify the facts are correctly set
+    - name: Set correct base policy and policy module
+      include_role:
+        name: linux-system-roles.crypto_policies
+      vars:
+        crypto_policies_policy: DEFAULT:NO-SHA1
+        crypto_policies_reload: false
+    - name: Verify that base policy and policy module were updated
+      assert:
+        that:
+          - crypto_policies_active == 'DEFAULT:NO-SHA1'
+          - crypto_policies_reboot_required | bool
+
+    - name: Setting incorrect base policy should fail
       block:
-        - meta: flush_handlers
-
-        - name: Check the current policy is LEGACY
+        - name: Set incorrect base policy
+          include_role:
+            name: linux-system-roles.crypto_policies
+          vars:
+            crypto_policies_policy: NOEXIST
+            crypto_policies_reload: false
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+      rescue:
+        - name: Check that we failed in the role
           assert:
             that:
-              - "crypto_policies_active == 'LEGACY'"
-              - "crypto_policies_reboot_required == true"
+              - crypto_policies_active == 'DEFAULT:NO-SHA1'
+              - ansible_failed_result.msg != 'UNREACH'
+            msg: "Role has not failed when it should have"
+
+    - name: Setting incorrect policy module should fail
+      block:
+        - name: Set incorrect policy module
+          include_role:
+            name: linux-system-roles.crypto_policies
+          vars:
+            crypto_policies_policy: DEFAULT:NOEXIST
+            crypto_policies_reload: false
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+      rescue:
+        - name: Check that we failed in the role
+          assert:
+            that:
+              - crypto_policies_active == 'DEFAULT:NO-SHA1'
+              - ansible_failed_result.msg != 'UNREACH'
+            msg: "Role has not failed when it should have"
