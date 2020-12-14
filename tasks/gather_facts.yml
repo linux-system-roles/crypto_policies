@@ -3,10 +3,10 @@
 - name: Find out what is the currently active policy
   command: "update-crypto-policies --show"
   changed_when: false
-  check_mode: no
+  check_mode: false
   register: __crypto_policies_active
 
 - name: Set current policy fact
   set_fact:
     crypto_policies_active: "{{ __crypto_policies_active.stdout }}"
-    cacheable: yes
+    cacheable: true
