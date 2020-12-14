@@ -1,4 +1,4 @@
 # SPDX-License-Identifier: MIT
 ---
 
-__crypto_policies_packages: [ "crypto-policies" ]
+__crypto_policies_packages: ["crypto-policies"]
