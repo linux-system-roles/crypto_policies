@@ -34,7 +34,7 @@
     crypto_policies_available_policies: >-
       {{ __crypto_policies_base_policies.files | map(attribute='path')
         | map('basename') | map('splitext') | map('first') | unique | list }}
-    cacheable: yes
+    cacheable: true
 
 - name: Find policy module files
   find:
@@ -49,7 +49,7 @@
     crypto_policies_available_modules: >-
       {{ __crypto_policies_policy_module.files | map(attribute='path')
         | map('basename') | map('splitext') | map('first') | unique | list }}
-    cacheable: yes
+    cacheable: true
 
 - name: Update crypto policy if needed
   command: >
