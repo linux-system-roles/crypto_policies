@@ -38,7 +38,7 @@ jobs:
           esac
           TOXENV="$toxenvs" .travis/runtox
         env:
-          LSR_ANSIBLES: 'ansible==2.7.* ansible==2.8.* ansible==2.9.*'
+          LSR_ANSIBLES: 'ansible==2.8.* ansible==2.9.*'
           LSR_MSCENARIOS: default
   python-26:
     runs-on: ubuntu-16.04
