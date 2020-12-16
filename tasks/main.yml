@@ -14,10 +14,20 @@
     __crypto_policies_vars_file: "{{ role_path }}/vars/{{ item }}"
   when: __crypto_policies_vars_file is file
 
+- name: Get installed packages
+  package_facts:
+  no_log: true
+
+# There is a bug in ansible 2.8 - the package/dnf module will update packages
+# that already exist.  We do not want that behavior, so we first check if the
+# package exists, then use the package module to install it if it does not
+# exist.
 - name: Ensure required packages are installed
   package:
-    name: "{{ __crypto_policies_packages }}"
+    name: "{{ item }}"
     state: present
+  loop: "{{ __crypto_policies_packages }}"
+  when: not item in ansible_facts.packages
 
 - include_tasks: gather_facts.yml
 
