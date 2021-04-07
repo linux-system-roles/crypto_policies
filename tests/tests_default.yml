@@ -18,5 +18,5 @@
               - "'DEFAULT' in crypto_policies_available_policies"
               - "'FUTURE' in crypto_policies_available_policies"
               - "'LEGACY' in crypto_policies_available_policies"
-              - "'NO-CAMELLIA' in crypto_policies_available_modules"
+              - "'AD-SUPPORT' in crypto_policies_available_modules"
               - crypto_policies_reboot_required is not defined
