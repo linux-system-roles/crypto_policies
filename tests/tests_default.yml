@@ -19,4 +19,5 @@
               - "'FUTURE' in crypto_policies_available_policies"
               - "'LEGACY' in crypto_policies_available_policies"
               - "'AD-SUPPORT' in crypto_policies_available_modules"
+              - "'AD-SUPPORT' in crypto_policies_available_subpolicies"
               - crypto_policies_reboot_required is not defined
