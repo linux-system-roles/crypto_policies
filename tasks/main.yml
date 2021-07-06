@@ -46,19 +46,25 @@
         | map('basename') | map('splitext') | map('first') | unique | list }}
     cacheable: true
 
-- name: Find policy module files
+- name: Find subpolicy files
   find:
     paths:
       - /usr/share/crypto-policies/policies/modules/
       - /etc/crypto-policies/policies/modules/
     patterns: '*.pmod'
-  register: __crypto_policies_policy_module
+  register: __crypto_policies_subpolicies
 
-- name: Set available policy modules fact
+- name: Set available subpolicies fact
+  set_fact:
+    crypto_policies_available_subpolicies: >-
+      {{ __crypto_policies_subpolicies.files | map(attribute='path')
+        | map('basename') | map('splitext') | map('first') | unique | list }}
+    cacheable: true
+
+- name: Set crypto_policies_available_modules fact (deprecated)
   set_fact:
     crypto_policies_available_modules: >-
-      {{ __crypto_policies_policy_module.files | map(attribute='path')
-        | map('basename') | map('splitext') | map('first') | unique | list }}
+      {{ crypto_policies_available_subpolicies }}
     cacheable: true
 
 - name: Update crypto policy if needed
@@ -67,7 +73,7 @@
       {{ '--no-reload' if not crypto_policies_reload else '' }}
       --set {{ crypto_policies_policy }}
   when:
-    # TODO check with available policies and modules
+    # TODO check with available policies and subpolicies
     - crypto_policies_policy is not none
     - crypto_policies_policy != crypto_policies_active
   notify: __crypto_policies_handler_modified
@@ -76,7 +82,7 @@
   set_fact:
     crypto_policies_reboot_required: true
   when:
-    # TODO check with available policies and modules
+    # TODO check with available policies and subpolicies
     - crypto_policies_policy is not none
     - crypto_policies_policy != crypto_policies_active
 

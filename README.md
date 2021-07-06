@@ -19,17 +19,17 @@ following section.
  * `crypto_policies_policy`
 
 Use this variable to specify the desired crypto policy on the target system,
-which can be either the base policy or a base policy with policy submodule(s)
+which can be either the base policy or a base policy with subpolicies
 as accepted by the `update-crypto-policies` tool. For example `FUTURE` or
-`DEFAULT:NO-SHA1:GOST`. The specified base policy and policy submodule(s)
+`DEFAULT:NO-SHA1:GOST`. The specified base policy and subpolicies
 must be available on the target system.
 
 The default value is `null` meaning the configuration is not changed and
 the role will just collect the facts below.
 
 The list of available base policies on the target system can be found in the
-`crypto_policies_available_policies` variable and the list of available policy
-submodules can be found in the `crypto_policies_available_modules` variable.
+`crypto_policies_available_policies` variable and the list of available
+subpolicies can be found in the `crypto_policies_available_subpolicies` variable.
 
  * `crypto_policies_reload`
 
@@ -61,15 +61,19 @@ by `crypto_policies_policy` variable above.
 * `crypto_policies_available_policies`
 
 This is a list of all base policies available on the target system.
-A custom policy files can be installed by copying the `.pol` files into
+Custom policy files can be installed by copying the `.pol` files into
 `/etc/crypto-policies/policies` directory (not implemented in this role yet).
+
+* `crypto_policies_available_subpolicies`
+
+This is a list of all subpolicies available on the target system.
+Custom subpolicies can be installed by copying the `.pmod` files into
+`/etc/crypto-policies/policies/modules` directory (not implemented in this
+role yet).
 
 * `crypto_policies_available_modules`
 
-This is a list of all policy submodules available on the target system.
-A custom policy submodule can be installed by copying the `.pmod` files into
-`/etc/crypto-policies/policies/modules` directory (not implemented in this
-role yet).
+Deprecated alias to `crypto_policies_available_subpolicies`.
 
 * `crypto_policies_reboot_required`
 

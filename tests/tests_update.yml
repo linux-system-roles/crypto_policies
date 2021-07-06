@@ -16,13 +16,13 @@
           - crypto_policies_active == 'LEGACY'
           - crypto_policies_reboot_required | bool
 
-    - name: Set correct base policy and policy module
+    - name: Set correct base policy and subpolicy
       include_role:
         name: linux-system-roles.crypto_policies
       vars:
         crypto_policies_policy: DEFAULT:NO-SHA1
         crypto_policies_reload: false
-    - name: Verify that base policy and policy module were updated
+    - name: Verify that base policy and subpolicy were updated
       assert:
         that:
           - crypto_policies_active == 'DEFAULT:NO-SHA1'
@@ -47,9 +47,9 @@
               - ansible_failed_result.msg != 'UNREACH'
             msg: "Role has not failed when it should have"
 
-    - name: Setting incorrect policy module should fail
+    - name: Setting incorrect subpolicy should fail
       block:
-        - name: Set incorrect policy module
+        - name: Set incorrect subpolicy
           include_role:
             name: linux-system-roles.crypto_policies
           vars:
