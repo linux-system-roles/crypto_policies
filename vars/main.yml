@@ -2,3 +2,10 @@
 ---
 
 __crypto_policies_packages: ["crypto-policies", "crypto-policies-scripts"]
+
+# ansible_facts required by the role
+__crypto_policies_required_facts:
+  - distribution
+  - distribution_major_version
+  - distribution_version
+  - os_family

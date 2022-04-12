@@ -4,7 +4,7 @@
   hosts: all
   roles:
     - linux-system-roles.crypto_policies
-
+  gather_facts: false
   tasks:
     - name: Verify the facts are correctly set
       block:
