@@ -2,6 +2,8 @@
 ---
 - name: Ensure we can set crypto policy including reboot of the system
   hosts: all
+  tags:
+    - tests::reboot
   roles:
     - role: linux-system-roles.crypto_policies
       vars:
