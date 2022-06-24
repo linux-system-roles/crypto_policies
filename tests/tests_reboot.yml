@@ -4,19 +4,41 @@
   hosts: all
   tags:
     - tests::reboot
-  roles:
-    - role: linux-system-roles.crypto_policies
-      vars:
-        crypto_policies_policy: FUTURE
-        crypto_policies_reboot_ok: true
 
   tasks:
-    - name: Verify the facts are correctly set
-      block:
-        - meta: flush_handlers
+    - block:
+        - name: Ensure we can set crypto policy including reboot of the system
+          include_role:
+            name: linux-system-roles.crypto_policies
+          vars:
+            crypto_policies_policy: FUTURE
+            crypto_policies_reboot_ok: true
+        - name: Verify the facts are correctly set
+          block:
+            - meta: flush_handlers
 
-        - name: Check the current policy is FUTURE
-          assert:
-            that:
-              - crypto_policies_active == 'FUTURE'
-              - not crypto_policies_reboot_required
+            - name: Check the current policy is FUTURE
+              assert:
+                that:
+                  - crypto_policies_active == 'FUTURE'
+                  - not crypto_policies_reboot_required
+
+      always:
+        - name: Restore policy to DEFAULT
+          tags:
+            - tests::cleanup
+          include_role:
+            name: linux-system-roles.crypto_policies
+          vars:
+            crypto_policies_policy: DEFAULT
+            crypto_policies_reboot_ok: true
+        - name: Check restoration
+          tags:
+            - tests::cleanup
+          block:
+            - meta: flush_handlers
+            - name: Check the current policy has been restored to DEFAULT
+              assert:
+                that:
+                  - crypto_policies_active == 'DEFAULT'
+                  - not crypto_policies_reboot_required

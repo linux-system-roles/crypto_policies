@@ -3,65 +3,85 @@
 - name: Ensure that we can set the policy using this role (without reboot)
   hosts: all
   tasks:
+    - block:
 
-    - name: Set correct base policy
-      include_role:
-        name: linux-system-roles.crypto_policies
-      vars:
-        crypto_policies_policy: LEGACY
-        crypto_policies_reload: false
-    - name: Verify that base policy was updated
-      assert:
-        that:
-          - crypto_policies_active == 'LEGACY'
-          - crypto_policies_reboot_required | bool
-
-    - name: Set correct base policy and subpolicy
-      include_role:
-        name: linux-system-roles.crypto_policies
-      vars:
-        crypto_policies_policy: DEFAULT:NO-SHA1
-        crypto_policies_reload: false
-    - name: Verify that base policy and subpolicy were updated
-      assert:
-        that:
-          - crypto_policies_active == 'DEFAULT:NO-SHA1'
-          - crypto_policies_reboot_required | bool
-
-    - name: Setting incorrect base policy should fail
-      block:
-        - name: Set incorrect base policy
+        - name: Set correct base policy
           include_role:
             name: linux-system-roles.crypto_policies
           vars:
-            crypto_policies_policy: NOEXIST
+            crypto_policies_policy: LEGACY
             crypto_policies_reload: false
-        - name: unreachable task
-          fail:
-            msg: UNREACH
-      rescue:
-        - name: Check that we failed in the role
+        - name: Verify that base policy was updated
           assert:
             that:
-              - crypto_policies_active == 'DEFAULT:NO-SHA1'
-              - ansible_failed_result.msg != 'UNREACH'
-            msg: "Role has not failed when it should have"
+              - crypto_policies_active == 'LEGACY'
+              - crypto_policies_reboot_required | bool
 
-    - name: Setting incorrect subpolicy should fail
-      block:
-        - name: Set incorrect subpolicy
+        - name: Set correct base policy and subpolicy
           include_role:
             name: linux-system-roles.crypto_policies
           vars:
-            crypto_policies_policy: DEFAULT:NOEXIST
+            crypto_policies_policy: DEFAULT:NO-SHA1
             crypto_policies_reload: false
-        - name: unreachable task
-          fail:
-            msg: UNREACH
-      rescue:
-        - name: Check that we failed in the role
+        - name: Verify that base policy and subpolicy were updated
           assert:
             that:
               - crypto_policies_active == 'DEFAULT:NO-SHA1'
-              - ansible_failed_result.msg != 'UNREACH'
-            msg: "Role has not failed when it should have"
+              - crypto_policies_reboot_required | bool
+
+        - name: Setting incorrect base policy should fail
+          block:
+            - name: Set incorrect base policy
+              include_role:
+                name: linux-system-roles.crypto_policies
+              vars:
+                crypto_policies_policy: NOEXIST
+                crypto_policies_reload: false
+            - name: unreachable task
+              fail:
+                msg: UNREACH
+          rescue:
+            - name: Check that we failed in the role
+              assert:
+                that:
+                  - crypto_policies_active == 'DEFAULT:NO-SHA1'
+                  - ansible_failed_result.msg != 'UNREACH'
+                msg: "Role has not failed when it should have"
+
+        - name: Setting incorrect subpolicy should fail
+          block:
+            - name: Set incorrect subpolicy
+              include_role:
+                name: linux-system-roles.crypto_policies
+              vars:
+                crypto_policies_policy: DEFAULT:NOEXIST
+                crypto_policies_reload: false
+            - name: unreachable task
+              fail:
+                msg: UNREACH
+          rescue:
+            - name: Check that we failed in the role
+              assert:
+                that:
+                  - crypto_policies_active == 'DEFAULT:NO-SHA1'
+                  - ansible_failed_result.msg != 'UNREACH'
+                msg: "Role has not failed when it should have"
+
+      always:
+        - name: Restore policy to DEFAULT
+          tags:
+            - tests::cleanup
+          include_role:
+            name: linux-system-roles.crypto_policies
+          vars:
+            crypto_policies_policy: DEFAULT
+        - name: Check restoration
+          tags:
+            - tests::cleanup
+          block:
+            - meta: flush_handlers
+            - name: Check the current policy has been restored to DEFAULT
+              assert:
+                that:
+                  - crypto_policies_active == 'DEFAULT'
+                  - crypto_policies_reboot_required | bool
