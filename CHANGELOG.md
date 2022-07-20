@@ -1,6 +1,35 @@
 Changelog
 =========
 
+[1.2.6] - 2022-07-19
+--------------------
+
+### New Features
+
+- none
+
+### Bug Fixes
+
+- none
+
+### Other Changes
+
+- Ensure role tests work with gather_facts: false (#41)
+
+Ensure role tests work when using ANSIBLE_GATHERING=explicit
+
+- Add cleanup to some tests to facilitate 'shared' test runs (#42)
+
+crypto_policies_reboot_required being a tri-state
+doesn't allow me to do that cleanly
+
+- make min_ansible_version a string in meta/main.yml (#43)
+
+The Ansible developers say that `min_ansible_version` in meta/main.yml
+must be a `string` value like `"2.9"`, not a `float` value like `2.9`.
+
+- Add CHANGELOG.md (#44)
+
 [1.2.5] - 2022-05-06
 --------------------
 
