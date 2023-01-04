@@ -3,8 +3,8 @@
 - name: Ensure that we can set the policy using this role (without reboot)
   hosts: all
   tasks:
-    - block:
-
+    - name: Run test
+      block:
         - name: Set correct base policy
           include_role:
             name: linux-system-roles.crypto_policies
@@ -37,7 +37,7 @@
               vars:
                 crypto_policies_policy: NOEXIST
                 crypto_policies_reload: false
-            - name: unreachable task
+            - name: Unreachable task
               fail:
                 msg: UNREACH
           rescue:
@@ -56,7 +56,7 @@
               vars:
                 crypto_policies_policy: DEFAULT:NOEXIST
                 crypto_policies_reload: false
-            - name: unreachable task
+            - name: Unreachable task
               fail:
                 msg: UNREACH
           rescue:
@@ -79,7 +79,8 @@
           tags:
             - tests::cleanup
           block:
-            - meta: flush_handlers
+            - name: Flush handlers
+              meta: flush_handlers
             - name: Check the current policy has been restored to DEFAULT
               assert:
                 that:

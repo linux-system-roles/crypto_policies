@@ -8,7 +8,8 @@
     name: "{{ __crypto_policies_packages }}"
     state: present
 
-- include_tasks: gather_facts.yml
+- name: Gather facts
+  include_tasks: gather_facts.yml
 
 - name: Find base policies files
   find:
@@ -65,5 +66,5 @@
     - crypto_policies_policy is not none
     - crypto_policies_policy != crypto_policies_active
 
-# Update the facts after applying the policy
-- include_tasks: gather_facts.yml
+- name: Update facts after applying policy
+  include_tasks: gather_facts.yml

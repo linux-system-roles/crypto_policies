@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: MIT
 ---
 
-- name: reboot the managed host to apply crypto policies changes
+- name: Reboot the managed host to apply crypto policies changes
   reboot:
   listen: __crypto_policies_handler_modified
   when:
     - crypto_policies_reboot_required | d(false)
     - crypto_policies_reboot_ok | d(false)
 
-- name: clear the crypto_policies_reboot_required flag
+- name: Clear the crypto_policies_reboot_required flag
   set_fact:
     crypto_policies_reboot_required: false
   listen: __crypto_policies_handler_modified

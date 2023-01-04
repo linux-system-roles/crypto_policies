@@ -6,7 +6,8 @@
     - tests::reboot
 
   tasks:
-    - block:
+    - name: Run test
+      block:
         - name: Ensure we can set crypto policy including reboot of the system
           include_role:
             name: linux-system-roles.crypto_policies
@@ -15,7 +16,8 @@
             crypto_policies_reboot_ok: true
         - name: Verify the facts are correctly set
           block:
-            - meta: flush_handlers
+            - name: Flush handlers
+              meta: flush_handlers
 
             - name: Check the current policy is FUTURE
               assert:
@@ -36,7 +38,8 @@
           tags:
             - tests::cleanup
           block:
-            - meta: flush_handlers
+            - name: Flush handlers
+              meta: flush_handlers
             - name: Check the current policy has been restored to DEFAULT
               assert:
                 that:
