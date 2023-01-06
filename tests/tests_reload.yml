@@ -3,8 +3,8 @@
 - name: Ensure that crypto_policy_reload variable works
   hosts: all
   tasks:
-    - block:
-
+    - name: Run test
+      block:
         - name: Run role to make sure all dependencies are installed
           include_role:
             name: linux-system-roles.crypto_policies
@@ -68,7 +68,8 @@
           tags:
             - tests::cleanup
           block:
-            - meta: flush_handlers
+            - name: Flush handlers
+              meta: flush_handlers
             - name: Check the current policy has been restored to DEFAULT
               assert:
                 that:

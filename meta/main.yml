@@ -15,8 +15,8 @@ galaxy_info:
         - all
     - name: EL
       versions:
-        - 8
-        - 9
+        - "8"
+        - "9"
 
   galaxy_tags:
     - crypto
