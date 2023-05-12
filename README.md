@@ -1,6 +1,6 @@
 # crypto_policies
-![CI Testing](https://github.com/linux-system-roles/crypto_policies/workflows/tox/badge.svg)
 
+![CI Testing](https://github.com/linux-system-roles/crypto_policies/workflows/tox/badge.svg)
 
 This Ansible role manages system-wide crypto policies.
 
@@ -8,15 +8,14 @@ This concept is well adopted since Red Hat Enterprise Linux 8 and in Fedora.
 
 ## Requirements
 
-The system-wide crypto policies are implemented and tested on RHEL 8/CentOS 8
-and Fedora.
+None
 
 ## Role Variables
 
 By default, this role will just report system status as described in the
 following section.
 
- * `crypto_policies_policy`
+* `crypto_policies_policy`
 
 Use this variable to specify the desired crypto policy on the target system,
 which can be either the base policy or a base policy with subpolicies
@@ -31,14 +30,14 @@ The list of available base policies on the target system can be found in the
 `crypto_policies_available_policies` variable and the list of available
 subpolicies can be found in the `crypto_policies_available_subpolicies` variable.
 
- * `crypto_policies_reload`
+* `crypto_policies_reload`
 
 By default (`true`), updating crypto policies forces reload of some of
 the daemons affected by crypto policies in the system. Setting `false`
 prevents this behavior and is helpful if the role is executed during system
 enrollment or some other follow-up tasks is expected to do it later.
 
- * `crypto_policies_reboot_ok`
+* `crypto_policies_reboot_ok`
 
 Crypto policies can not know all the custom applications using crypto
 libraries that are affected by change of crypto policies so it is recommended
@@ -80,10 +79,6 @@ Deprecated alias to `crypto_policies_available_subpolicies`.
 Default `false` - if `true`, this means a reboot is needed to apply
 the changes made by the role
 
-## Dependencies
-
-None.
-
 ## Example Playbook
 
 The following playbook configures the system to the default crypto policy
@@ -91,7 +86,8 @@ level without SHA1. The update is done without reboot (which is recommended
 to do by the user afterwards).
 
 ```yaml
-- hosts: all
+- name: Manage crypto policies
+  hosts: all
   roles:
     role: linux-system-roles.crypto_policies
     vars:
