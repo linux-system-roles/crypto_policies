@@ -6,10 +6,6 @@ This Ansible role manages system-wide crypto policies.
 
 This concept is well adopted since Red Hat Enterprise Linux 8 and in Fedora.
 
-## Requirements
-
-None
-
 ## Role Variables
 
 By default, this role will just report system status as described in the
