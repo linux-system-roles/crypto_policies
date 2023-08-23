@@ -1,6 +1,8 @@
 # crypto_policies
 
-![CI Testing](https://github.com/linux-system-roles/crypto_policies/workflows/tox/badge.svg)
+[![ansible-lint.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-lint.yml) [![ansible-test.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-test.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-test.yml) [![markdownlint.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/markdownlint.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/markdownlint.yml) [![woke.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/woke.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/woke.yml)
+
+---
 
 This Ansible role manages system-wide crypto policies.
 
