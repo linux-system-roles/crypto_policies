@@ -6,6 +6,20 @@ This Ansible role manages system-wide crypto policies.
 
 This concept is well adopted since Red Hat Enterprise Linux 8 and in Fedora.
 
+## Requirements
+
+See below
+
+### Collection requirements
+
+If you want to manage `rpm-ostree` systems with this role, you will need to
+install additional collections.  Please run the following command line to
+install the collection.
+
+```bash
+ansible-galaxy collection install -vv -r meta/collection-requirements.yml
+```
+
 ## Role Variables
 
 By default, this role will just report system status as described in the
@@ -91,6 +105,10 @@ to do by the user afterwards).
       crypto_policies_reload: false
 
 ```
+
+## rpm-ostree
+
+See README-ostree.md
 
 ## License
 
