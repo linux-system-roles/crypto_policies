@@ -1,0 +1,1 @@
+roles/crypto_policies/.ostree/get_ostree_data.sh shebang!skip
