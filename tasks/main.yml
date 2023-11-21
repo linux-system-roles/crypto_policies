@@ -7,6 +7,8 @@
   package:
     name: "{{ __crypto_policies_packages }}"
     state: present
+    use: "{{ (__crypto_policies_is_ostree | d(false)) |
+      ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
 
 - name: Gather facts
   include_tasks: gather_facts.yml
