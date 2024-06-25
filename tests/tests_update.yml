@@ -17,16 +17,24 @@
               - crypto_policies_active == 'LEGACY'
               - crypto_policies_reboot_required | bool
 
+        - name: Set policy and subpolicy to use for test
+          set_fact:
+            __policy_and_sub: "{{ 'DEFAULT:NO-SHA1'
+              if 'NO-SHA1' in crypto_policies_available_subpolicies
+              else 'DEFAULT:AD-SUPPORT'
+              if 'AD-SUPPORT' in crypto_policies_available_subpolicies
+              else 'DEFAULT:' ~ crypto_policies_available_subpolicies[0] }}"
+
         - name: Set correct base policy and subpolicy
           include_role:
             name: linux-system-roles.crypto_policies
           vars:
-            crypto_policies_policy: DEFAULT:NO-SHA1
+            crypto_policies_policy: "{{ __policy_and_sub }}"
             crypto_policies_reload: false
         - name: Verify that base policy and subpolicy were updated
           assert:
             that:
-              - crypto_policies_active == 'DEFAULT:NO-SHA1'
+              - crypto_policies_active == __policy_and_sub
               - crypto_policies_reboot_required | bool
 
         - name: Setting incorrect base policy should fail
@@ -44,7 +52,7 @@
             - name: Check that we failed in the role
               assert:
                 that:
-                  - crypto_policies_active == 'DEFAULT:NO-SHA1'
+                  - crypto_policies_active == __policy_and_sub
                   - ansible_failed_result.msg != 'UNREACH'
                 msg: "Role has not failed when it should have"
 
@@ -63,7 +71,7 @@
             - name: Check that we failed in the role
               assert:
                 that:
-                  - crypto_policies_active == 'DEFAULT:NO-SHA1'
+                  - crypto_policies_active == __policy_and_sub
                   - ansible_failed_result.msg != 'UNREACH'
                 msg: "Role has not failed when it should have"
 
