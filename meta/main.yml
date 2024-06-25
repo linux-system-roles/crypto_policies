@@ -4,11 +4,8 @@ galaxy_info:
   author: Jakub Jelen <jjelen@redhat.com>
   description: This Ansible role manages system-wide crypto policies.
   company: Red Hat, Inc.
-
   license: MIT
-
   min_ansible_version: "2.9"
-
   platforms:
     - name: Fedora
       versions:
@@ -17,24 +14,25 @@ galaxy_info:
       versions:
         - "8"
         - "9"
-
   galaxy_tags:
-    - crypto
-    - tls
-    - ssh
-    - security
-    - fedora
-    - redhat
-    - openssl
-    - nss
-    - gnutls
-    - openssh
     - bind
-    - krb5
-    - kerberos
+    - crypto
+    - el8
+    - el9
+    - el10
+    - fedora
+    - gnutls
     - java
+    - kerberos
+    - krb5
     - libssh
-    - system
     - networking
-
+    - nss
+    - openssh
+    - openssl
+    - redhat
+    - security
+    - ssh
+    - system
+    - tls
 dependencies: []
