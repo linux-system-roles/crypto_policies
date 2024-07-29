@@ -6,3 +6,4 @@
 crypto_policies_policy: null
 crypto_policies_reload: true
 crypto_policies_reboot_ok: false
+crypto_policies_transactional_update_reboot_ok: null

@@ -60,6 +60,15 @@ need reboot. If there are no other tasks in the playbook that require reboot,
 you can set this value to `true` and this role will handle the reboot for you,
 when needed.
 
+* `crypto_policies_transactional_update_reboot_ok`
+
+This variable is used to handle reboots required by transactional updates.
+If a transactional update requires a reboot, the role will proceed with the
+reboot if crypto_policies_transactional_update_reboot_ok is set to true. If set
+to false, the role will notify the user that a reboot is required, allowing
+for custom handling of the reboot requirement. If this variable is not set,
+the role will fail to ensure the reboot requirement is not overlooked.
+
 ### Variables Exported by the Role
 
 * `crypto_policies_active`
@@ -99,10 +108,10 @@ to do by the user afterwards).
 - name: Manage crypto policies
   hosts: all
   roles:
-    role: linux-system-roles.crypto_policies
-    vars:
-      crypto_policies_policy: "DEFAULT:NO-SHA1"
-      crypto_policies_reload: false
+    - role: linux-system-roles.crypto_policies
+      vars:
+        crypto_policies_policy: "DEFAULT:NO-SHA1"
+        crypto_policies_reload: false
 
 ```
 
