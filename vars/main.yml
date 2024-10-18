@@ -15,3 +15,21 @@ __crypto_policies_required_facts:
 # the 'gather_subset' parameter of the 'setup' module
 __crypto_policies_required_facts_subsets: "{{ ['!all', '!min'] +
   __crypto_policies_required_facts }}"
+
+# BEGIN - DO NOT EDIT THIS BLOCK - rh distros variables
+# Ansible distribution identifiers that the role treats like RHEL
+__crypto_policies_rh_distros:
+  - AlmaLinux
+  - CentOS
+  - RedHat
+  - Rocky
+
+# Same as above but includes Fedora
+__crypto_policies_rh_distros_fedora: "{{ __crypto_policies_rh_distros + ['Fedora'] }}"
+
+# Use this in conditionals to check if distro is Red Hat or clone
+__crypto_policies_is_rh_distro: "{{ ansible_distribution in __crypto_policies_rh_distros }}"
+
+# Use this in conditionals to check if distro is Red Hat or clone, or Fedora
+__crypto_policies_is_rh_distro_fedora: "{{ ansible_distribution in __crypto_policies_rh_distros_fedora }}"
+# END - DO NOT EDIT THIS BLOCK - rh distros variables
