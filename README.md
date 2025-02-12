@@ -30,7 +30,7 @@ following section.
 Use this variable to specify the desired crypto policy on the target system,
 which can be either the base policy or a base policy with subpolicies
 as accepted by the `update-crypto-policies` tool. For example `FUTURE` or
-`DEFAULT:NO-SHA1:GOST`. The specified base policy and subpolicies
+`DEFAULT:NO-SHA1:GOST`. The specified base policy and subpolicies  <!-- codespell:ignore gost -->
 must be available on the target system.
 
 The default value is `null` meaning the configuration is not changed and
