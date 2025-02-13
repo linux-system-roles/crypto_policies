@@ -1,6 +1,6 @@
 # crypto_policies
 
-[![ansible-lint.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-lint.yml) [![ansible-test.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-test.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-test.yml) [![markdownlint.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/markdownlint.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/markdownlint.yml) [![tft.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/tft.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/tft.yml) [![tft_citest_bad.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/tft_citest_bad.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/tft_citest_bad.yml) [![woke.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/woke.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/woke.yml)
+[![ansible-lint.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-lint.yml) [![ansible-test.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-test.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/ansible-test.yml) [![codespell.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/codespell.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/codespell.yml) [![markdownlint.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/markdownlint.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/markdownlint.yml) [![tft.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/tft.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/tft.yml) [![tft_citest_bad.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/tft_citest_bad.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/tft_citest_bad.yml) [![woke.yml](https://github.com/linux-system-roles/crypto_policies/actions/workflows/woke.yml/badge.svg)](https://github.com/linux-system-roles/crypto_policies/actions/workflows/woke.yml)
 
 This Ansible role manages system-wide crypto policies.
 
@@ -30,7 +30,7 @@ following section.
 Use this variable to specify the desired crypto policy on the target system,
 which can be either the base policy or a base policy with subpolicies
 as accepted by the `update-crypto-policies` tool. For example `FUTURE` or
-`DEFAULT:NO-SHA1:GOST`. The specified base policy and subpolicies
+`DEFAULT:NO-SHA1:GOST`. The specified base policy and subpolicies  <!-- codespell:ignore gost -->
 must be available on the target system.
 
 The default value is `null` meaning the configuration is not changed and
