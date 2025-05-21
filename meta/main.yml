@@ -16,6 +16,8 @@ galaxy_info:
         - "9"
   galaxy_tags:
     - bind
+    - container
+    - containerbuild
     - crypto
     - el8
     - el9
