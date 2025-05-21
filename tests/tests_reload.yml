@@ -2,6 +2,8 @@
 ---
 - name: Ensure that crypto_policy_reload variable works
   hosts: all
+  tags:
+    - tests::booted
   tasks:
     - name: Run test
       block:
