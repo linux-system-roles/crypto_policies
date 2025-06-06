@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Bootc end-to-end test
+  hosts: all
+  tags:
+    - tests::bootc-e2e
+  gather_facts: false
+
+  tasks:
+    - name: Bootc image build preparation
+      when: ansible_connection | d("") == "buildah"
+      block:
+        - name: Change crypto policy to FUTURE
+          include_role:
+            name: linux-system-roles.crypto_policies
+          vars:
+            crypto_policies_policy: FUTURE
+
+        - name: Create QEMU deployment
+          delegate_to: localhost
+          command: "{{ lsr_scriptdir }}/bootc-buildah-qcow.sh {{ ansible_host }}"
+          changed_when: true
+
+      always:
+        - name: Restore policy to DEFAULT
+          tags:
+            - tests::cleanup
+          include_role:
+            name: linux-system-roles.crypto_policies
+          vars:
+            crypto_policies_policy: DEFAULT
+
+    - name: Validation of deployed image
+      when: ansible_connection | d("") != "buildah"
+      block:
+        - name: Get current crypto policy
+          command: update-crypto-policies --show
+          changed_when: false
+          register: current
+
+        - name: Check the current policy is FUTURE
+          assert:
+            that:
+              - current.stdout | trim == 'FUTURE'
