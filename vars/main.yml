@@ -28,8 +28,8 @@ __crypto_policies_rh_distros:
 __crypto_policies_rh_distros_fedora: "{{ __crypto_policies_rh_distros + ['Fedora'] }}"
 
 # Use this in conditionals to check if distro is Red Hat or clone
-__crypto_policies_is_rh_distro: "{{ ansible_distribution in __crypto_policies_rh_distros }}"
+__crypto_policies_is_rh_distro: "{{ ansible_facts['distribution'] in __crypto_policies_rh_distros }}"
 
 # Use this in conditionals to check if distro is Red Hat or clone, or Fedora
-__crypto_policies_is_rh_distro_fedora: "{{ ansible_distribution in __crypto_policies_rh_distros_fedora }}"
+__crypto_policies_is_rh_distro_fedora: "{{ ansible_facts['distribution'] in __crypto_policies_rh_distros_fedora }}"
 # END - DO NOT EDIT THIS BLOCK - rh distros variables
