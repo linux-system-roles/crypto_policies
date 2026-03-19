@@ -2,10 +2,10 @@
 ---
 - name: Ensure that the role runs with default parameters
   hosts: all
-  roles:
-    - linux-system-roles.crypto_policies
-  gather_facts: false
   tasks:
+    - name: Run linux-system-roles.crypto_policies
+      include_tasks: tasks/run_role_with_clear_facts.yml
+
     - name: Verify the facts are correctly set
       block:
         - name: Flush handlers

@@ -8,8 +8,7 @@
     - name: Run test
       block:
         - name: Run role to make sure all dependencies are installed
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
 
         - name: Get SSHD pid before policy update
           slurp:
@@ -17,8 +16,7 @@
           register: sshd_pid_before
 
         - name: Change policy from DEFAULT TO LEGACY (disable reload)
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: LEGACY
             crypto_policies_reload: false
@@ -38,8 +36,7 @@
               - sshd_pid_before.content == sshd_pid_after_first.content
 
         - name: Change policy from LEGACY to DEFAULT (reload by default)
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: DEFAULT
 
@@ -62,8 +59,7 @@
         - name: Restore policy to DEFAULT
           tags:
             - tests::cleanup
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: DEFAULT
         - name: Check restoration
