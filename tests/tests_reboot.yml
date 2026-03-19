@@ -9,8 +9,7 @@
     - name: Run test
       block:
         - name: Ensure we can set crypto policy including reboot of the system
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: FUTURE
             crypto_policies_reboot_ok: true
@@ -29,8 +28,7 @@
         - name: Restore policy to DEFAULT
           tags:
             - tests::cleanup
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: DEFAULT
             crypto_policies_reboot_ok: true

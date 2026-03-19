@@ -13,8 +13,7 @@
       no_log: true
 
     - name: Include role
-      include_role:
-        name: linux-system-roles.crypto_policies
+      include_tasks: tasks/run_role_with_clear_facts.yml
 
     - name: Refresh package facts
       package_facts:

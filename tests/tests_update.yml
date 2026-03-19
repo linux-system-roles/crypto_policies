@@ -6,8 +6,7 @@
     - name: Run test
       block:
         - name: Set correct base policy
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: LEGACY
             crypto_policies_reload: false
@@ -26,8 +25,7 @@
               else 'DEFAULT:' ~ crypto_policies_available_subpolicies[0] }}"
 
         - name: Set correct base policy and subpolicy
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: "{{ __policy_and_sub }}"
             crypto_policies_reload: false
@@ -40,8 +38,7 @@
         - name: Setting incorrect base policy should fail
           block:
             - name: Set incorrect base policy
-              include_role:
-                name: linux-system-roles.crypto_policies
+              include_tasks: tasks/run_role_with_clear_facts.yml
               vars:
                 crypto_policies_policy: NOEXIST
                 crypto_policies_reload: false
@@ -59,8 +56,7 @@
         - name: Setting incorrect subpolicy should fail
           block:
             - name: Set incorrect subpolicy
-              include_role:
-                name: linux-system-roles.crypto_policies
+              include_tasks: tasks/run_role_with_clear_facts.yml
               vars:
                 crypto_policies_policy: DEFAULT:NOEXIST
                 crypto_policies_reload: false
@@ -79,8 +75,7 @@
         - name: Restore policy to DEFAULT
           tags:
             - tests::cleanup
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: DEFAULT
         - name: Check restoration

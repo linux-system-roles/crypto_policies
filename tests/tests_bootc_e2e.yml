@@ -4,15 +4,13 @@
   hosts: all
   tags:
     - tests::bootc-e2e
-  gather_facts: false
 
   tasks:
     - name: Bootc image build preparation
       when: ansible_connection | d("") == "buildah"
       block:
         - name: Change crypto policy to FUTURE
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: FUTURE
 
@@ -25,8 +23,7 @@
         - name: Restore policy to DEFAULT
           tags:
             - tests::cleanup
-          include_role:
-            name: linux-system-roles.crypto_policies
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: DEFAULT
 
