@@ -71,6 +71,134 @@
                   - ansible_failed_result.msg != 'UNREACH'
                 msg: "Role has not failed when it should have"
 
+        - name: Test custom subpolicy and update-crypto-policies --check
+          block:
+            - name: Check if update-crypto-policies supports --check
+              command: update-crypto-policies --help
+              register: __ucp_help
+              changed_when: false
+
+            - name: Set fact for --check support
+              set_fact:
+                __crypto_policies_check_supported: >-
+                  {{ '--check' in __ucp_help.stdout }}
+
+            - name: Create custom subpolicy file
+              copy:
+                dest: /etc/crypto-policies/policies/modules/TEST_POLICY.pmod
+                content: |
+                  # test subpolicy
+                  min_rsa_size = 2048
+                mode: "0644"
+
+            - name: Set policy with custom subpolicy
+              include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                crypto_policies_policy: DEFAULT:TEST_POLICY
+                crypto_policies_reload: false
+
+            - name: Verify custom subpolicy was applied
+              assert:
+                that:
+                  - crypto_policies_active == 'DEFAULT:TEST_POLICY'
+                  - "'TEST_POLICY' in crypto_policies_available_subpolicies"
+
+            - name: Check policy is applied before subpolicy modification
+              command: update-crypto-policies --check
+              register: __check_before_modify
+              changed_when: false
+              when: __crypto_policies_check_supported | bool
+
+            - name: Verify policy matches before subpolicy modification
+              assert:
+                that:
+                  - __check_before_modify.rc == 0
+                  - >-
+                    'matches the generated policy'
+                    in __check_before_modify.stdout
+              when: __crypto_policies_check_supported | bool
+
+            - name: Get generated policy state before subpolicy modification
+              stat:
+                path: /etc/crypto-policies/state/CURRENT.pol
+              register: __policy_state_before_modify
+
+            - name: Modify custom subpolicy file
+              copy:
+                dest: /etc/crypto-policies/policies/modules/TEST_POLICY.pmod
+                content: |
+                  # test subpolicy modified
+                  min_rsa_size = 3072
+                mode: "0644"
+
+            - name: Get generated policy state after subpolicy modification
+              stat:
+                path: /etc/crypto-policies/state/CURRENT.pol
+              register: __policy_state_after_modify
+
+            - name: Verify generated policy unchanged after subpolicy modification
+              assert:
+                that:
+                  - >-
+                    __policy_state_after_modify.stat.checksum
+                    == __policy_state_before_modify.stat.checksum
+
+            - name: Check policy after subpolicy modification
+              command: update-crypto-policies --check
+              register: __check_after_modify
+              changed_when: false
+              failed_when: false
+              when: __crypto_policies_check_supported | bool
+
+            - name: Verify policy mismatch is reported after subpolicy modification
+              assert:
+                that:
+                  - __check_after_modify.rc == 1
+                  - >-
+                    'does NOT match the generated policy'
+                    in __check_after_modify.stderr
+              when: __crypto_policies_check_supported | bool
+
+            # When --check is supported, the role should detect drift and regenerate.
+            # On EL8 and other platforms without --check, force regeneration explicitly.
+            - name: Run role to regenerate policy after subpolicy modification
+              include_tasks: tasks/run_role_with_clear_facts.yml
+              when: __crypto_policies_check_supported | bool
+
+            - name: Run role to regenerate policy when --check is not supported
+              include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                crypto_policies_force_regenerate: true
+              when: not __crypto_policies_check_supported | bool
+
+            - name: Check policy after role regenerated configuration
+              command: update-crypto-policies --check
+              register: __check_after_role
+              changed_when: false
+              when: __crypto_policies_check_supported | bool
+
+            - name: Verify policy matches after role regenerated configuration
+              assert:
+                that:
+                  - __check_after_role.rc == 0
+                  - >-
+                    'matches the generated policy'
+                    in __check_after_role.stdout
+              when: __crypto_policies_check_supported | bool
+
+            - name: Get generated policy state after role regenerated configuration
+              stat:
+                path: /etc/crypto-policies/state/CURRENT.pol
+              register: __policy_state_after_role
+
+            - name: Verify generated policy updated after role regenerated configuration
+              assert:
+                that:
+                  - >-
+                    __policy_state_after_role.stat.checksum
+                    != __policy_state_before_modify.stat.checksum
+              when: not __crypto_policies_check_supported | bool
+
       always:
         - name: Restore policy to DEFAULT
           tags:
@@ -78,6 +206,12 @@
           include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             crypto_policies_policy: DEFAULT
+        - name: Remove custom subpolicy file
+          tags:
+            - tests::cleanup
+          file:
+            path: /etc/crypto-policies/policies/modules/TEST_POLICY.pmod
+            state: absent
         - name: Check restoration
           tags:
             - tests::cleanup
