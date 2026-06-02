@@ -47,6 +47,27 @@ the daemons affected by crypto policies in the system. Setting `false`
 prevents this behavior and is helpful if the role is executed during system
 enrollment or some other follow-up tasks is expected to do it later.
 
+* `crypto_policies_force_regenerate`
+
+The default value is `false`.  Setting this to `true` will force the role to
+regenerate the active crypto policy.  When should this be used?  When the crypto
+policy configuration on the system has been modified (for example, editing
+subpolicy files), and this is not detected by `update-crypto-policies --check`,
+and you want to force the policy to be regenerated.  The role will automatically
+regenerate the active crypto policy in these cases:
+
+* The user sets `crypto_policies_policy` and the policy is different than the
+  current policy.
+* The user manually updates a policy or subpolicy file and this is detected by
+  `update-crypto-policies --check`
+
+However, there may be cases when the changes to the crypto policy configuration
+are not detected by `update-crypto-policies --check`.  You can set
+`crypto_policies_force_regenerate: true` to force the policy to be regenerated.
+On RHEL/CentOS 8 and other platforms where `update-crypto-policies --check` is
+not supported, you must set `crypto_policies_force_regenerate: true` after
+modifying policy or subpolicy files so the role can regenerate the active policy.
+
 * `crypto_policies_reboot_ok`
 
 Crypto policies can not know all the custom applications using crypto

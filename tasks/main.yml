@@ -84,14 +84,50 @@
     - crypto_policies_policy != crypto_policies_active
   changed_when: true
   notify: __crypto_policies_handler_modified
+  register: __crypto_policies_update_policy
+
+- name: Regenerate crypto policy when update was not needed
+  when: __crypto_policies_update_policy is skipped
+  block:
+    - name: Check if update-crypto-policies supports --check
+      command: update-crypto-policies --help
+      register: __crypto_policies_update_help
+      changed_when: false
+
+    - name: Check whether configured policy matches generated policy
+      command: update-crypto-policies --check
+      register: __crypto_policies_check
+      changed_when: false
+      failed_when: false
+      when: "'--check' in __crypto_policies_update_help.stdout"
+
+    - name: Regenerate crypto policy if needed
+      command: update-crypto-policies
+      when:
+        - >-
+          crypto_policies_force_regenerate | bool
+          or (
+            __crypto_policies_check is defined
+            and not __crypto_policies_check.skipped | default(false)
+            and __crypto_policies_check.rc | d(0) == 1
+            and (
+              "The configured policy does NOT match the generated policy"
+              in __crypto_policies_check.stderr | d("")
+            )
+          )
+      changed_when: true
+      register: __crypto_policies_regenerate_policy
+      notify: __crypto_policies_handler_modified
 
 - name: Set the reboot_required flag if needed
   set_fact:
     crypto_policies_reboot_required: true
   when:
     # TODO check with available policies and subpolicies
-    - crypto_policies_policy is not none
-    - crypto_policies_policy != crypto_policies_active
+    - (__crypto_policies_regenerate_policy is defined and
+       __crypto_policies_regenerate_policy is changed) or
+      (__crypto_policies_update_policy is defined and
+       __crypto_policies_update_policy is changed)
 
 - name: Update facts after applying policy
   include_tasks: gather_facts.yml
