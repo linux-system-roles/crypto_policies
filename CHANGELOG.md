@@ -1,6 +1,21 @@
 Changelog
 =========
 
+[1.7.0] - 2026-06-24
+--------------------
+
+### New Features
+
+- feat: regenerate policy automatically if check fails, add crypto_policies_force_regenerate (#197)
+
+### Other Changes
+
+- ci: bump actions/github-script from 8 to 9 (#193)
+- refactor: use ansible.posix 2.1.X for EL7 compatibility [citest_skip] (#194)
+- ci: Add config file for CodeRabbit with custom rules (#195)
+- ci: Skip reviews for PRs with [citest_skip] in the title (#196)
+- test: remove unused files [citest_skip] (#198)
+
 [1.6.0] - 2026-04-28
 --------------------
 
