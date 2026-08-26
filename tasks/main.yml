@@ -1,5 +1,8 @@
 # SPDX-License-Identifier: MIT
 ---
+- name: Validate role parameters
+  ansible.builtin.include_tasks: assert_role_vars.yml
+
 - name: Set platform/version specific variables
   include_tasks: set_vars.yml
 

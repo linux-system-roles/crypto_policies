@@ -1,0 +1,198 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Verify invalid parameters are rejected
+  hosts: all
+  tasks:
+    - name: Run invalid input tests
+      block:
+        # ====================================================
+        # Section 1: Verify role works with valid defaults
+        # ====================================================
+        - name: Run role with valid defaults
+          ansible.builtin.include_role:
+            name: linux-system-roles.crypto_policies
+
+        # ====================================================
+        # Section 2: argument_specs validation (Ansible 2.10+)
+        # ====================================================
+        - name: Run argument specs validation tests
+          when: ansible_version.full is version("2.10", ">=")
+          block:
+            # --- Test: non-bool crypto_policies_reload ---
+            - name: Argument specs reject non-bool crypto_policies_reload
+              block:
+                - name: Run role with non-bool crypto_policies_reload
+                  ansible.builtin.include_role:
+                    name: linux-system-roles.crypto_policies
+                  vars:
+                    crypto_policies_reload: "not_a_bool"
+              rescue:
+                - name: Mark invalid crypto_policies_reload type rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_reload_type_failed: true
+
+            - name: Assert invalid crypto_policies_reload type was rejected
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_reload_type_failed | default(false)
+                fail_msg: >-
+                  argument_specs should reject crypto_policies_reload
+                  with type string
+
+            # --- Test: non-bool crypto_policies_force_regenerate ---
+            - name: Argument specs reject non-bool crypto_policies_force_regenerate
+              block:
+                - name: Run role with non-bool crypto_policies_force_regenerate
+                  ansible.builtin.include_role:
+                    name: linux-system-roles.crypto_policies
+                  vars:
+                    crypto_policies_force_regenerate: "not_a_bool"
+              rescue:
+                - name: Mark invalid crypto_policies_force_regenerate type rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_force_regenerate_type_failed: true
+
+            - name: Assert invalid crypto_policies_force_regenerate type was rejected
+              ansible.builtin.assert:
+                that:
+                  - >-
+                    __invalid_input_force_regenerate_type_failed
+                    | default(false)
+                fail_msg: >-
+                  argument_specs should reject
+                  crypto_policies_force_regenerate with type string
+
+            # --- Test: non-bool crypto_policies_reboot_ok ---
+            - name: Argument specs reject non-bool crypto_policies_reboot_ok
+              block:
+                - name: Run role with non-bool crypto_policies_reboot_ok
+                  ansible.builtin.include_role:
+                    name: linux-system-roles.crypto_policies
+                  vars:
+                    crypto_policies_reboot_ok: "not_a_bool"
+              rescue:
+                - name: Mark invalid crypto_policies_reboot_ok type rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_reboot_ok_type_failed: true
+
+            - name: Assert invalid crypto_policies_reboot_ok type was rejected
+              ansible.builtin.assert:
+                that:
+                  - >-
+                    __invalid_input_reboot_ok_type_failed
+                    | default(false)
+                fail_msg: >-
+                  argument_specs should reject crypto_policies_reboot_ok
+                  with type string
+
+        # ====================================================
+        # Section 3: assert_role_vars validation (all versions)
+        # ====================================================
+
+        # --- Test: crypto_policies_policy as non-string, non-null ---
+        - name: Assert rejects crypto_policies_policy as integer
+          block:
+            - name: Run role with crypto_policies_policy as integer
+              ansible.builtin.include_role:
+                name: linux-system-roles.crypto_policies
+              vars:
+                crypto_policies_policy: 123
+          rescue:
+            - name: Mark crypto_policies_policy integer rejected
+              ansible.builtin.set_fact:
+                __invalid_input_policy_int_failed: true
+
+        - name: Assert crypto_policies_policy as integer was rejected
+          ansible.builtin.assert:
+            that:
+              - >-
+                __invalid_input_policy_int_failed
+                | default(false)
+            fail_msg: >-
+              assert_role_vars should reject crypto_policies_policy
+              when given an integer value
+
+        # --- Test: crypto_policies_policy as list ---
+        - name: Assert rejects crypto_policies_policy as list
+          block:
+            - name: Run role with crypto_policies_policy as list
+              ansible.builtin.include_role:
+                name: linux-system-roles.crypto_policies
+              vars:
+                crypto_policies_policy:
+                  - DEFAULT
+                  - FUTURE
+          rescue:
+            - name: Mark crypto_policies_policy list rejected
+              ansible.builtin.set_fact:
+                __invalid_input_policy_list_failed: true
+
+        - name: Assert crypto_policies_policy as list was rejected
+          ansible.builtin.assert:
+            that:
+              - >-
+                __invalid_input_policy_list_failed
+                | default(false)
+            fail_msg: >-
+              assert_role_vars should reject crypto_policies_policy
+              when given a list value
+
+        # --- Test: transactional_update_reboot_ok as string ---
+        - name: Assert rejects transactional_update_reboot_ok as string
+          block:
+            - name: Run role with transactional_update_reboot_ok as string
+              ansible.builtin.include_role:
+                name: linux-system-roles.crypto_policies
+              vars:
+                crypto_policies_transactional_update_reboot_ok: "not_a_bool"
+          rescue:
+            - name: Mark transactional_update_reboot_ok string rejected
+              ansible.builtin.set_fact:
+                __invalid_input_tu_reboot_ok_str_failed: true
+
+        - name: Assert transactional_update_reboot_ok as string was rejected
+          ansible.builtin.assert:
+            that:
+              - >-
+                __invalid_input_tu_reboot_ok_str_failed
+                | default(false)
+            fail_msg: >-
+              assert_role_vars should reject
+              crypto_policies_transactional_update_reboot_ok when given
+              a string value
+
+        # --- Test: transactional_update_reboot_ok as integer ---
+        - name: Assert rejects transactional_update_reboot_ok as integer
+          block:
+            - name: Run role with transactional_update_reboot_ok as integer
+              ansible.builtin.include_role:
+                name: linux-system-roles.crypto_policies
+              vars:
+                crypto_policies_transactional_update_reboot_ok: 123
+          rescue:
+            - name: Mark transactional_update_reboot_ok integer rejected
+              ansible.builtin.set_fact:
+                __invalid_input_tu_reboot_ok_int_failed: true
+
+        - name: Assert transactional_update_reboot_ok as integer was rejected
+          ansible.builtin.assert:
+            that:
+              - >-
+                __invalid_input_tu_reboot_ok_int_failed
+                | default(false)
+            fail_msg: >-
+              assert_role_vars should reject
+              crypto_policies_transactional_update_reboot_ok when given
+              an integer value
+
+      always:
+        - name: Clear test facts
+          ansible.builtin.set_fact:
+            __invalid_input_reload_type_failed:
+            __invalid_input_force_regenerate_type_failed:
+            __invalid_input_reboot_ok_type_failed:
+            __invalid_input_policy_int_failed:
+            __invalid_input_policy_list_failed:
+            __invalid_input_tu_reboot_ok_str_failed:
+            __invalid_input_tu_reboot_ok_int_failed:
+          tags: tests::cleanup

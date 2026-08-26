@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: MIT
+---
+argument_specs:
+  main:
+    short_description: The crypto_policies role.
+    description: >
+      The crypto_policies role allows you to manage system-wide crypto
+      policies. It can set the active policy, reload affected daemons,
+      and optionally reboot the system to apply changes.
+    options:
+      crypto_policies_policy:
+        type: raw
+        description: >
+          The desired crypto policy on the target system. Can be a
+          base policy or a base policy with subpolicies as accepted
+          by update-crypto-policies, for example `FUTURE` or
+          `DEFAULT:NO-SHA1:GOST`. Defaults to `null`, meaning the
+          configuration is not changed and the role will just collect
+          facts.
+      crypto_policies_reload:
+        type: bool
+        description: >
+          Whether to force reload of daemons affected by crypto
+          policies after updating the policy. Defaults to `true`.
+      crypto_policies_force_regenerate:
+        type: bool
+        description: >
+          Whether to force regeneration of the active crypto policy
+          even if update-crypto-policies does not detect changes.
+          Defaults to `false`.
+      crypto_policies_reboot_ok:
+        type: bool
+        description: >
+          Whether the role is allowed to reboot the system after
+          changing crypto policies. If `false`, the role sets
+          `crypto_policies_reboot_required` and leaves the reboot
+          to the user. Defaults to `false`.
+      crypto_policies_transactional_update_reboot_ok:
+        type: raw
+        description: >
+          Controls reboot behavior for transactional update systems.
+          When `true`, the role reboots the system. When `false`, the
+          reboot is skipped. When `null`, the role fails if a reboot
+          is required. Defaults to `null`.
