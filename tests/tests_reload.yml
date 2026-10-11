@@ -11,9 +11,14 @@
           include_tasks: tasks/run_role_with_clear_facts.yml
 
         - name: Get SSHD pid before policy update
-          slurp:
-            src: /var/run/sshd.pid
+          command: systemctl show sshd -p MainPID --value  # noqa command-instead-of-module
+          changed_when: false
           register: sshd_pid_before
+
+        - name: Check that sshd is running
+          assert:
+            that:
+              - sshd_pid_before.stdout | int > 0
 
         - name: Change policy from DEFAULT TO LEGACY (disable reload)
           include_tasks: tasks/run_role_with_clear_facts.yml
@@ -22,8 +27,8 @@
             crypto_policies_reload: false
 
         - name: Get sshd pid after first update
-          slurp:
-            src: /var/run/sshd.pid
+          command: systemctl show sshd -p MainPID --value  # noqa command-instead-of-module
+          changed_when: false
           register: sshd_pid_after_first
 
         - name: Verify that policy was changed to LEGACY
@@ -33,7 +38,7 @@
         - name: Check the sshd was not reloaded
           assert:
             that:
-              - sshd_pid_before.content == sshd_pid_after_first.content
+              - sshd_pid_before.stdout == sshd_pid_after_first.stdout
 
         - name: Change policy from LEGACY to DEFAULT (reload by default)
           include_tasks: tasks/run_role_with_clear_facts.yml
@@ -41,8 +46,8 @@
             crypto_policies_policy: DEFAULT
 
         - name: Get sshd pid after second update
-          slurp:
-            src: /var/run/sshd.pid
+          command: systemctl show sshd -p MainPID --value  # noqa command-instead-of-module
+          changed_when: false
           register: sshd_pid_after_second
 
         - name: Verify that policy was changed to DEFAULT
@@ -53,7 +58,8 @@
         - name: Check the sshd was reloaded
           assert:
             that:
-              - sshd_pid_after_first.content != sshd_pid_after_second.content
+              - sshd_pid_after_second.stdout | int > 0
+              - sshd_pid_after_first.stdout != sshd_pid_after_second.stdout
 
       always:
         - name: Restore policy to DEFAULT
