@@ -27,6 +27,7 @@ galaxy_info:
     - java
     - kerberos
     - krb5
+    - leap16
     - libssh
     - networking
     - nss
@@ -34,6 +35,8 @@ galaxy_info:
     - openssl
     - redhat
     - security
+    - sles
+    - sles16
     - ssh
     - system
     - tls
