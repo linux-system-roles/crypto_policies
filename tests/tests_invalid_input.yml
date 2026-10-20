@@ -2,6 +2,13 @@
 ---
 - name: Verify invalid parameters are rejected
   hosts: all
+  vars:
+    __invalid_input_failure_messages: >-
+      {{ ([ansible_failed_result.msg | default(''),
+           ansible_failed_result.msg.msg | default('')]
+          + (ansible_failed_result.results | default([])
+             | map(attribute='msg') | map('default', '') | list))
+         | join(' ') }}
   tasks:
     - name: Run invalid input tests
       block:
@@ -30,6 +37,11 @@
                 - name: Mark invalid crypto_policies_reload type rejected
                   ansible.builtin.set_fact:
                     __invalid_input_reload_type_failed: true
+                  when: >-
+                    "argument 'crypto_policies_reload' is of type" in
+                    __invalid_input_failure_messages and
+                    'we were unable to convert to bool' in
+                    __invalid_input_failure_messages
 
             - name: Assert invalid crypto_policies_reload type was rejected
               ansible.builtin.assert:
@@ -51,6 +63,11 @@
                 - name: Mark invalid crypto_policies_force_regenerate type rejected
                   ansible.builtin.set_fact:
                     __invalid_input_force_regenerate_type_failed: true
+                  when: >-
+                    "argument 'crypto_policies_force_regenerate' is of type" in
+                    __invalid_input_failure_messages and
+                    'we were unable to convert to bool' in
+                    __invalid_input_failure_messages
 
             - name: Assert invalid crypto_policies_force_regenerate type was rejected
               ansible.builtin.assert:
@@ -74,6 +91,11 @@
                 - name: Mark invalid crypto_policies_reboot_ok type rejected
                   ansible.builtin.set_fact:
                     __invalid_input_reboot_ok_type_failed: true
+                  when: >-
+                    "argument 'crypto_policies_reboot_ok' is of type" in
+                    __invalid_input_failure_messages and
+                    'we were unable to convert to bool' in
+                    __invalid_input_failure_messages
 
             - name: Assert invalid crypto_policies_reboot_ok type was rejected
               ansible.builtin.assert:
@@ -101,6 +123,9 @@
             - name: Mark crypto_policies_policy integer rejected
               ansible.builtin.set_fact:
                 __invalid_input_policy_int_failed: true
+              when: >-
+                'crypto_policies_policy must be null or a string, got int'
+                in __invalid_input_failure_messages
 
         - name: Assert crypto_policies_policy as integer was rejected
           ansible.builtin.assert:
@@ -126,6 +151,9 @@
             - name: Mark crypto_policies_policy list rejected
               ansible.builtin.set_fact:
                 __invalid_input_policy_list_failed: true
+              when: >-
+                'crypto_policies_policy must be null or a string, got list'
+                in __invalid_input_failure_messages
 
         - name: Assert crypto_policies_policy as list was rejected
           ansible.builtin.assert:
@@ -149,6 +177,11 @@
             - name: Mark transactional_update_reboot_ok string rejected
               ansible.builtin.set_fact:
                 __invalid_input_tu_reboot_ok_str_failed: true
+              when: >-
+                'crypto_policies_transactional_update_reboot_ok must be null or a boolean, got str'
+                in __invalid_input_failure_messages or
+                'crypto_policies_transactional_update_reboot_ok must be null or a boolean, got AnsibleUnicode'
+                in __invalid_input_failure_messages
 
         - name: Assert transactional_update_reboot_ok as string was rejected
           ansible.builtin.assert:
@@ -173,6 +206,9 @@
             - name: Mark transactional_update_reboot_ok integer rejected
               ansible.builtin.set_fact:
                 __invalid_input_tu_reboot_ok_int_failed: true
+              when: >-
+                'crypto_policies_transactional_update_reboot_ok must be null or a boolean, got int'
+                in __invalid_input_failure_messages
 
         - name: Assert transactional_update_reboot_ok as integer was rejected
           ansible.builtin.assert:
