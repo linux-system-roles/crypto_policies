@@ -1,15 +1,12 @@
 # SPDX-License-Identifier: MIT
 ---
+# A missing package would be installed by the role and fail the check below
+- name: Install the role's packages before saving the package facts
+  import_playbook: setup-snapshot.yml
+
 - name: Ensure that running the role does not update packages
   hosts: all
   tasks:
-    # SUSE minimal images lack the scripts that Fedora and EL images ship
-    - name: Ensure crypto-policies-scripts is installed
-      package:
-        name: crypto-policies-scripts
-        state: present
-      when: ansible_facts['os_family'] == 'Suse'
-
     - name: Get package facts
       package_facts:
       no_log: true
